@@ -4,24 +4,6 @@ This repository contains fully solved **Design and Analysis of Algorithms (DAA)*
 
 ---
 
-## 📁 Folder Structure
-
-DAA/
-├── Lab/
-│ ├── lab1_<filename>.c # Arrays, prefix sum, duplicates
-│ ├── lab2_<filename>.c # Recursion, GCD
-│ ├── lab3_<filename>.c # Merge sort, Quick sort
-│ ├── lab4_<filename>.c # Min-Heap, Max-Heap
-│ ├── lab5_<filename>.c # Fractional Knapsack, Huffman
-│ ├── lab6_<filename>.c # Prim's, Kruskal's MST
-│ ├── lab7_<filename>.c # Dijkstra’s algorithm
-│ ├── lab8_<filename>.c # Matrix Chain, LCS
-│ ├── lab9_<filename>.c # Floyd-Warshall
-│ └── lab10_<filename>.c # Randomized Quicksort, Amortization
-
-
----
-
 ## 📚 Labs Covered
 
 | Lab | Topic |
