@@ -21,7 +21,8 @@ int main() {
         }
     }
 
-    printf("Total duplicate elements: %d\\n", duplicates);
-    printf("Most frequent element: %d\\n", mostFreqElem);
+    printf("Total duplicate elements: %d\n", duplicates);
+    printf("Most frequent element: %d\n", mostFreqElem);
     fclose(fp);
     return 0;
+}

@@ -27,8 +27,8 @@ int main() {
 
     rotate_right(A, p2);
 
-    printf("\\nAfter ROTATE: ");
+    printf("\nAfter ROTATE: ");
     for (int i = 0; i < N; i++) printf("%d ", A[i]);
-    printf("\\n");
+    printf("\n");
     return 0;
 }

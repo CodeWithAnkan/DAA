@@ -15,6 +15,6 @@ int main() {
     printf("Prefix Sum Array: ");
     for (int i = 0; i < n; i++)
         printf("%d ", prefixSum[i]);
-    printf("\\n");
+    printf("\n");
     return 0;
 }
