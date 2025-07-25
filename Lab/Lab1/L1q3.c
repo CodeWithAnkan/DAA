@@ -9,11 +9,11 @@ int main() {
     }
 
     int num, count[10001] = {0};  
-    int totalNumbers = 0;
+    int totalNum = 0;
     
     while (fscanf(fp, "%d", &num) == 1) {
         count[num]++;
-        totalNumbers++;
+        totalNum++;
     }
 
     int duplicates = 0, maxFreq = 0, mostFreqElem = 0;
@@ -28,7 +28,7 @@ int main() {
         }
     }
 
-    printf("Total numbers processed: %d\n", totalNumbers);
+    printf("Total numbers processed: %d\n", totalNum);
     printf("Total duplicate elements: %d\n", duplicates);
     printf("Most frequent element: %d (appears %d times)\n", mostFreqElem, maxFreq);
     
