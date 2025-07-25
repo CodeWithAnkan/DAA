@@ -11,7 +11,6 @@ int main() {
     int num, count[10001] = {0};  
     int totalNumbers = 0;
     
-    // Read numbers until end of file
     while (fscanf(fp, "%d", &num) == 1) {
         count[num]++;
         totalNumbers++;
@@ -19,7 +18,6 @@ int main() {
 
     int duplicates = 0, maxFreq = 0, mostFreqElem = 0;
     
-    // Find duplicates and most frequent element
     for (int i = 1; i <= 10000; i++) {
         if (count[i] > 1) {
             duplicates++;
