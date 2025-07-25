@@ -2,27 +2,38 @@
 #include <stdlib.h>
 
 int main() {
-    FILE *fp = fopen("inDup.dat", "r");
-    int n, arr[1000], count[1000] = {0};
-    fscanf(fp, "%d", &n);
-    for (int i = 0; i < n; i++)
-        fscanf(fp, "%d", &arr[i]);
+    FILE *fp = fopen("students.dat", "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
 
-    int duplicates = 0, maxFreq = 0, mostFreqElem;
-    for (int i = 0; i < n; i++)
-        count[arr[i]]++;
+    int num, count[10001] = {0};  
+    int totalNumbers = 0;
+    
+    // Read numbers until end of file
+    while (fscanf(fp, "%d", &num) == 1) {
+        count[num]++;
+        totalNumbers++;
+    }
 
-    for (int i = 0; i < 1000; i++) {
-        if (count[i] > 1)
+    int duplicates = 0, maxFreq = 0, mostFreqElem = 0;
+    
+    // Find duplicates and most frequent element
+    for (int i = 1; i <= 10000; i++) {
+        if (count[i] > 1) {
             duplicates++;
+        }
         if (count[i] > maxFreq) {
             maxFreq = count[i];
             mostFreqElem = i;
         }
     }
 
+    printf("Total numbers processed: %d\n", totalNumbers);
     printf("Total duplicate elements: %d\n", duplicates);
-    printf("Most frequent element: %d\n", mostFreqElem);
+    printf("Most frequent element: %d (appears %d times)\n", mostFreqElem, maxFreq);
+    
     fclose(fp);
     return 0;
 }
