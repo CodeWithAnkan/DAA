@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 typedef struct {
     int id;
@@ -8,15 +9,18 @@ typedef struct {
     int age, height, weight;
 } Person;
 
-Person heap[100];
+#define MAX_HEAP_SIZE 1000
+#define MAX_NAME_LENGTH 99
+
+Person heap[MAX_HEAP_SIZE];
 int heapSize = 0;
-char mode[10]; // "min" or "max"
+char mode[10] = "";
 
 int compare(Person a, Person b) {
     if (strcmp(mode, "min") == 0)
-        return a.age - b.age; // Min-heap by age
+        return a.age - b.age;
     else
-        return b.weight - a.weight; // Max-heap by weight
+        return b.weight - a.weight;
 }
 
 void heapify(int i) {
@@ -67,48 +71,78 @@ void displayHeap() {
 
 int main() {
     FILE *fp = fopen("students.dat", "r");
+    if (fp == NULL) {
+        printf("Error: Could not open file students.dat\n");
+        return 1;
+    }
+    
     int n;
-    fscanf(fp, "%d", &n);
+    if (fscanf(fp, "%d", &n) != 1 || n <= 0 || n > MAX_HEAP_SIZE) {
+        printf("Error: Invalid number of students in file\n");
+        fclose(fp);
+        return 1;
+    }
+    
     for (int i = 0; i < n; i++) {
-        fscanf(fp, "%d %s %d %d %d", &heap[i].id, heap[i].name, &heap[i].age, &heap[i].height, &heap[i].weight);
+        if (fscanf(fp, "%d %99s %d %d %d", 
+                  &heap[i].id, heap[i].name, &heap[i].age, &heap[i].height, &heap[i].weight) != 5) {
+            printf("Error reading student data at index %d\n", i);
+            fclose(fp);
+            return 1;
+        }
     }
     heapSize = n;
     fclose(fp);
 
     int choice;
     do {
-        printf("\\nMAIN MENU (HEAP)\\n");
-        printf("1. Display Students\\n2. Create Min-heap (age)\\n3. Create Max-heap (weight)\\n");
-        printf("4. Display weight of youngest\\n5. Insert new person\\n6. Delete oldest\\n7. Exit\\n");
+        printf("\nMAIN MENU (HEAP)\n");
+        printf("1. Display Students\n2. Create Min-heap (age)\n3. Create Max-heap (weight)\n");
+        printf("4. Display weight of youngest\n5. Insert new person\n6. Delete root\n7. Exit\n");
         scanf("%d", &choice);
 
         if (choice == 1) displayHeap();
         else if (choice == 2) {
             strcpy(mode, "min");
             buildHeap();
-            printf("Min-heap created based on age.\\n");
+            printf("Min-heap created based on age.\n");
         }
         else if (choice == 3) {
             strcpy(mode, "max");
             buildHeap();
-            printf("Max-heap created based on weight.\\n");
+            printf("Max-heap created based on weight.\n");
         }
         else if (choice == 4) {
             if (heapSize > 0) {
-                printf("Weight of youngest person: %d pounds\\n", heap[0].weight);
+                printf("Weight of youngest person: %d pounds\n", heap[0].weight);
             }
         }
         else if (choice == 5) {
+            if (heapSize >= MAX_HEAP_SIZE) {
+                printf("Error: Heap is full. Cannot insert more students.\n");
+                continue;
+            }
             Person p;
             printf("Enter ID Name Age Height Weight: ");
-            scanf("%d %s %d %d %d", &p.id, p.name, &p.age, &p.height, &p.weight);
+            if (scanf("%d %99s %d %d %d", 
+                     &p.id, p.name, &p.age, &p.height, &p.weight) != 5) {
+                printf("Invalid input. Please try again.\n");
+                // Clear input buffer
+                while (getchar() != '\n');
+                continue;
+            }
             insert(p);
         }
         else if (choice == 6) {
             deleteRoot();
-            printf("Oldest person removed.\\n");
+            printf("Root of the heap removed.\n");
         }
 
+        else if (choice != 7) {
+            printf("Invalid choice. Please try again.\n");
+        }
+        // Clear input buffer
+        while (getchar() != '\n');
     } while (choice != 7);
 
     return 0;
