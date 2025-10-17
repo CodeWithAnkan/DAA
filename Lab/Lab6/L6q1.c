@@ -1,65 +1,183 @@
 #include <stdio.h>
 #include <limits.h>
+#include <stdlib.h>
 
-#define V 100
+#define MAX_VERTICES 100
 
-int minKey(int key[], int mstSet[], int n) {
-    int min = INT_MAX, min_index;
-    for (int v = 0; v < n; v++)
-        if (!mstSet[v] && key[v] < min)
-            min = key[v], min_index = v;
-    return min_index;
+// Priority Queue (Min-Heap) structure
+typedef struct {
+    int vertex;
+    int key;
+} PQNode;
+
+typedef struct {
+    PQNode arr[MAX_VERTICES];
+    int size;
+} PriorityQueue;
+
+// Function to swap two nodes
+void swap(PQNode* a, PQNode* b) {
+    PQNode temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
-void printMST(int parent[], int graph[V][V], int n) {
-    int total = 0;
-    printf("MST Adjacency Matrix:\n");
+// Heapify function for min-heap
+void minHeapify(PriorityQueue* pq, int idx) {
+    int smallest = idx;
+    int left = 2 * idx + 1;
+    int right = 2 * idx + 2;
+
+    if (left < pq->size && pq->arr[left].key < pq->arr[smallest].key)
+        smallest = left;
+    if (right < pq->size && pq->arr[right].key < pq->arr[smallest].key)
+        smallest = right;
+
+    if (smallest != idx) {
+        swap(&pq->arr[smallest], &pq->arr[idx]);
+        minHeapify(pq, smallest);
+    }
+}
+
+// Extract minimum from priority queue
+PQNode extractMin(PriorityQueue* pq) {
+    if (pq->size <= 0) {
+        PQNode empty = {-1, INT_MAX};
+        return empty;
+    }
+    if (pq->size == 1) {
+        pq->size--;
+        return pq->arr[0];
+    }
+
+    PQNode root = pq->arr[0];
+    pq->arr[0] = pq->arr[pq->size - 1];
+    pq->size--;
+    minHeapify(pq, 0);
+    return root;
+}
+
+// Decrease key in priority queue (for updating distances)
+void decreaseKey(PriorityQueue* pq, int vertex, int newKey) {
+    int i;
+    for (i = 0; i < pq->size; i++) {
+        if (pq->arr[i].vertex == vertex) {
+            pq->arr[i].key = newKey;
+            break;
+        }
+    }
+    // Bubble up
+    while (i > 0 && pq->arr[(i-1)/2].key > pq->arr[i].key) {
+        swap(&pq->arr[i], &pq->arr[(i-1)/2]);
+        i = (i-1)/2;
+    }
+}
+
+// Initialize priority queue with all vertices
+void initPQ(PriorityQueue* pq, int n, int start) {
+    pq->size = n;
+    for (int i = 0; i < n; i++) {
+        pq->arr[i].vertex = i;
+        pq->arr[i].key = (i == start) ? 0 : INT_MAX;
+    }
+    // Build min-heap
+    for (int i = n / 2 - 1; i >= 0; i--)
+        minHeapify(pq, i);
+}
+
+// Function to print the MST adjacency matrix
+void printMST(int parent[], int graph[MAX_VERTICES][MAX_VERTICES], int n) {
+    int mstMatrix[MAX_VERTICES][MAX_VERTICES];
+    int totalCost = 0;
+
+    // Initialize MST matrix with 0s
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            if ((parent[j] == i || parent[i] == j) && graph[i][j])
-                printf("%d ", graph[i][j]);
-            else
-                printf("0 ");
+            mstMatrix[i][j] = 0;
+        }
+    }
+
+    // Set MST edges in the matrix
+    for (int i = 1; i < n; i++) {
+        int u = parent[i];
+        int v = i;
+        if (u != -1) {
+            mstMatrix[u][v] = graph[u][v];
+            mstMatrix[v][u] = graph[u][v];  // Since undirected
+            totalCost += graph[u][v];
+        }
+    }
+
+    // Print MST adjacency matrix
+    printf("MST Cost Adjacency Matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%d ", mstMatrix[i][j]);
         }
         printf("\n");
     }
 
-    for (int i = 1; i < n; i++)
-        total += graph[i][parent[i]];
-    printf("Total Weight of MST: %d\n", total);
+    printf("Total Cost of MST: %d\n", totalCost);
 }
 
-void primMST(int graph[V][V], int n) {
-    int parent[V], key[V], mstSet[V];
-    for (int i = 0; i < n; i++)
-        key[i] = INT_MAX, mstSet[i] = 0;
+// Prim's algorithm using priority queue
+void primMST(int graph[MAX_VERTICES][MAX_VERTICES], int n, int start) {
+    int parent[MAX_VERTICES];
+    int inMST[MAX_VERTICES];
+    PriorityQueue pq;
 
-    key[0] = 0;
-    parent[0] = -1;
+    // Initialize
+    for (int i = 0; i < n; i++) {
+        parent[i] = -1;
+        inMST[i] = 0;
+    }
 
-    for (int count = 0; count < n - 1; count++) {
-        int u = minKey(key, mstSet, n);
-        mstSet[u] = 1;
+    initPQ(&pq, n, start);
 
-        for (int v = 0; v < n; v++)
-            if (graph[u][v] && !mstSet[v] && graph[u][v] < key[v])
-                parent[v] = u, key[v] = graph[u][v];
+    while (pq.size > 0) {
+        PQNode minNode = extractMin(&pq);
+        int u = minNode.vertex;
+        inMST[u] = 1;
+
+        // Update adjacent vertices
+        for (int v = 0; v < n; v++) {
+            if (graph[u][v] && !inMST[v] && graph[u][v] < pq.arr[v].key) {
+                parent[v] = u;
+                decreaseKey(&pq, v, graph[u][v]);
+            }
+        }
     }
 
     printMST(parent, graph, n);
 }
 
 int main() {
-    int n;
+    int n, start;
     printf("Enter number of vertices: ");
     scanf("%d", &n);
 
-    int graph[V][V];
-    printf("Enter cost adjacency matrix:\n");
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            scanf("%d", &graph[i][j]);
+    FILE* file = fopen("inUnAdjMat.dat", "r");
+    if (!file) {
+        printf("Error opening file inUnAdjMat.dat\n");
+        return 1;
+    }
 
-    primMST(graph, n);
+    int graph[MAX_VERTICES][MAX_VERTICES];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (fscanf(file, "%d", &graph[i][j]) != 1) {
+                printf("Error reading matrix from file\n");
+                fclose(file);
+                return 1;
+            }
+        }
+    }
+    fclose(file);
+
+    printf("Enter starting vertex (1 to %d): ", n);
+    scanf("%d", &start);
+    start--;  // Convert to 0-based for internal use
+
+    primMST(graph, n, start);
     return 0;
 }

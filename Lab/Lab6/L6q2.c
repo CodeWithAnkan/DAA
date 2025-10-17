@@ -27,12 +27,19 @@ int compare(const void *a, const void *b) {
 
 int main() {
     int n, m;
-    printf("Enter number of vertices and edges: ");
-    scanf("%d %d", &n, &m);
+    printf("Enter number of vertices (n) and edges (m): ");
+    if (scanf("%d %d", &n, &m) != 2) {
+        printf("Invalid input for n and m.\n");
+        return 1;
+    }
 
     Edge edges[m];
+    printf("Enter %d edges (u v w):\n", m);
     for (int i = 0; i < m; i++) {
-        scanf("%d %d %d", &edges[i].u, &edges[i].v, &edges[i].w);
+        if (scanf("%d %d %d", &edges[i].u, &edges[i].v, &edges[i].w) != 3) {
+            printf("Invalid input for edge %d.\n", i + 1);
+            return 1;
+        }
         edges[i].u--; // 0-based index
         edges[i].v--;
     }
@@ -43,6 +50,7 @@ int main() {
     qsort(edges, m, sizeof(Edge), compare);
 
     int total = 0;
+    printf("Selected Edges for MST:\n");
     printf("Edge\tCost\n");
     for (int i = 0, count = 0; i < m && count < n - 1; i++) {
         int u = edges[i].u, v = edges[i].v, w = edges[i].w;
@@ -54,6 +62,6 @@ int main() {
         }
     }
 
-    printf("Total Weight of MST: %d\n", total);
+    printf("\nTotal Weight of MST: %d\n", total);
     return 0;
 }

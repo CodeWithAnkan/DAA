@@ -59,10 +59,22 @@ int main() {
     printf("Enter number of vertices: ");
     scanf("%d", &n);
 
-    printf("Enter the cost adjacency matrix:\n");
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            scanf("%d", &graph[i][j]);
+    FILE* file = fopen("inDiAdjMat1.dat", "r");
+    if (!file) {
+        printf("Error opening file inDiAdjMat1.dat\n");
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (fscanf(file, "%d", &graph[i][j]) != 1) {
+                printf("Error reading matrix from file\n");
+                fclose(file);
+                return 1;
+            }
+        }
+    }
+    fclose(file);
 
     printf("Enter source vertex (1-based index): ");
     scanf("%d", &src);
