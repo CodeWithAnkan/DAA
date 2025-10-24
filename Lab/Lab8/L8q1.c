@@ -17,13 +17,19 @@ int main() {
     printf("Enter number of matrices: ");
     scanf("%d", &n);
 
-    printf("Enter dimensions:\n");
-    for (int i = 0; i <= n; i++) {
-        if (i == 0)
-            printf("Enter row of A1: ");
-        else
-            printf("Enter col of A%d: ", i);
-        scanf("%d", &p[i]);
+    int row[20], col[20];
+    for (int i = 1; i <= n; i++) {
+        printf("Enter row and col size of A%d: ", i);
+        scanf("%d %d", &row[i], &col[i]);
+        if (i > 1 && col[i-1] != row[i]) {
+            printf("Dimension mismatch!\n");
+            return 1;
+        }
+    }
+
+    p[0] = row[1];
+    for (int i = 1; i <= n; i++) {
+        p[i] = col[i];
     }
 
     for (int L = 2; L <= n; L++) {

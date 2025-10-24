@@ -17,7 +17,7 @@ void floydWarshall(int graph[V][V], int n, int src, int dest) {
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++) {
             dist[i][j] = graph[i][j];
-            path[i][j] = (graph[i][j] != INF && i != j) ? i : -1;
+            path[i][j] = -1;
         }
 
     for (int k = 0; k < n; k++)
@@ -25,8 +25,18 @@ void floydWarshall(int graph[V][V], int n, int src, int dest) {
             for (int j = 0; j < n; j++)
                 if (dist[i][k] + dist[k][j] < dist[i][j]) {
                     dist[i][j] = dist[i][k] + dist[k][j];
-                    path[i][j] = path[k][j];
+                    path[i][j] = k;
                 }
+
+    for (int i = 0; i < n; i++)
+
+        if (dist[i][i] < 0) {
+
+            printf("Negative cycle detected.\n");
+
+            return;
+
+        }
 
     printf("Shortest path weight matrix:\n");
     for (int i = 0; i < n; i++) {
@@ -56,14 +66,18 @@ int main() {
 
     printf("Enter number of vertices: ");
     scanf("%d", &n);
-    printf("Enter cost adjacency matrix (use 99999 for INF):\n");
+    FILE *fp = fopen("inDiAdjMat2.dat", "r");
+    if (fp == NULL) {
+        printf("Error opening file.\n");
+        return 1;
+    }
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++) {
-            scanf("%d", &graph[i][j]);
+            fscanf(fp, "%d", &graph[i][j]);
             if (graph[i][j] == 0 && i != j)
                 graph[i][j] = INF;
         }
-
+    fclose(fp);
     printf("Enter source and destination (1-based index): ");
     scanf("%d %d", &src, &dest);
 
