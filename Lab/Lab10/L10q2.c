@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void printFit(char fit[], int n) {
+void printFit(int fit[], int n) {
     for (int i = n - 1; i >= 0; i--)
         printf("%d", fit[i]);
     printf("\n");
